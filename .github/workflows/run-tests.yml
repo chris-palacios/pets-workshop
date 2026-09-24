@@ -13,13 +13,14 @@ jobs:
   test-api:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.12', '3.13', '3.14']
 
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Setup Python environment
         id: seed
         uses: ./.github/actions/setup-python-env
         with:
@@ -44,12 +45,6 @@ jobs:
         with:
           database-path: app/server/test_dogshelter.db
 
-      - name: Run e2e tests
-        working-directory: ./app/client
-        run: npx playwright test
-        env:
-          DATABASE_PATH: ${{ steps.seed.outputs.database-file }}
-
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
@@ -68,3 +63,5 @@ jobs:
       - name: Run e2e tests
         working-directory: ./app/client
         run: npx playwright test
+        env:
+          DATABASE_PATH: ${{ steps.seed.outputs.database-file }}
